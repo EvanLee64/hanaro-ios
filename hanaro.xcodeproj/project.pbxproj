@@ -14,9 +14,12 @@
 		A9D87BB4299DCE2E00C83793 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9D87BB3299DCE2E00C83793 /* Assets.xcassets */; };
 		A9D87BB7299DCE2E00C83793 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A9D87BB5299DCE2E00C83793 /* LaunchScreen.storyboard */; };
 		A9D87BC0299DD83200C83793 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9D87BBF299DD83200C83793 /* WebKit.framework */; };
+		A9D87BC2299E004100C83793 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A9D87BC1299E004100C83793 /* GoogleService-Info.plist */; };
+		B083310740F5885723FF86C4 /* Pods_hanaro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F68BC92126D7D94CAD154B /* Pods_hanaro.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		21EAAD1C21F1DF930AFA2273 /* Pods-hanaro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hanaro.debug.xcconfig"; path = "Target Support Files/Pods-hanaro/Pods-hanaro.debug.xcconfig"; sourceTree = "<group>"; };
 		A9D87BA7299DCE2C00C83793 /* hanaro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hanaro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9D87BAA299DCE2C00C83793 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A9D87BAC299DCE2C00C83793 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -26,6 +29,10 @@
 		A9D87BB6299DCE2E00C83793 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A9D87BB8299DCE2E00C83793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9D87BBF299DD83200C83793 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		A9D87BC1299E004100C83793 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../저축하나로 문서/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A9D87BC3299E04C800C83793 /* hanaro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hanaro.entitlements; sourceTree = "<group>"; };
+		D8F68BC92126D7D94CAD154B /* Pods_hanaro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hanaro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F3072850FC6D54D1F3F5BC00 /* Pods-hanaro.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hanaro.release.xcconfig"; path = "Target Support Files/Pods-hanaro/Pods-hanaro.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,18 +41,29 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9D87BC0299DD83200C83793 /* WebKit.framework in Frameworks */,
+				B083310740F5885723FF86C4 /* Pods_hanaro.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		63457FEFBBC2BF666DA36F16 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				21EAAD1C21F1DF930AFA2273 /* Pods-hanaro.debug.xcconfig */,
+				F3072850FC6D54D1F3F5BC00 /* Pods-hanaro.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A9D87B9E299DCE2C00C83793 = {
 			isa = PBXGroup;
 			children = (
 				A9D87BA9299DCE2C00C83793 /* hanaro */,
 				A9D87BA8299DCE2C00C83793 /* Products */,
 				A9D87BBE299DD83100C83793 /* Frameworks */,
+				63457FEFBBC2BF666DA36F16 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +78,7 @@
 		A9D87BA9299DCE2C00C83793 /* hanaro */ = {
 			isa = PBXGroup;
 			children = (
+				A9D87BC3299E04C800C83793 /* hanaro.entitlements */,
 				A9D87BAA299DCE2C00C83793 /* AppDelegate.swift */,
 				A9D87BAC299DCE2C00C83793 /* SceneDelegate.swift */,
 				A9D87BAE299DCE2C00C83793 /* ViewController.swift */,
@@ -67,6 +86,7 @@
 				A9D87BB3299DCE2E00C83793 /* Assets.xcassets */,
 				A9D87BB5299DCE2E00C83793 /* LaunchScreen.storyboard */,
 				A9D87BB8299DCE2E00C83793 /* Info.plist */,
+				A9D87BC1299E004100C83793 /* GoogleService-Info.plist */,
 			);
 			path = hanaro;
 			sourceTree = "<group>";
@@ -75,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				A9D87BBF299DD83200C83793 /* WebKit.framework */,
+				D8F68BC92126D7D94CAD154B /* Pods_hanaro.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -86,9 +107,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A9D87BBB299DCE2E00C83793 /* Build configuration list for PBXNativeTarget "hanaro" */;
 			buildPhases = (
+				30A38AEFD7F3A7DE2C511628 /* [CP] Check Pods Manifest.lock */,
 				A9D87BA3299DCE2C00C83793 /* Sources */,
 				A9D87BA4299DCE2C00C83793 /* Frameworks */,
 				A9D87BA5299DCE2C00C83793 /* Resources */,
+				BDEFE42F59D6E0B61520320D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -138,12 +161,55 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9D87BB7299DCE2E00C83793 /* LaunchScreen.storyboard in Resources */,
+				A9D87BC2299E004100C83793 /* GoogleService-Info.plist in Resources */,
 				A9D87BB4299DCE2E00C83793 /* Assets.xcassets in Resources */,
 				A9D87BB2299DCE2C00C83793 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		30A38AEFD7F3A7DE2C511628 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-hanaro-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BDEFE42F59D6E0B61520320D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hanaro/Pods-hanaro-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hanaro/Pods-hanaro-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hanaro/Pods-hanaro-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A9D87BA3299DCE2C00C83793 /* Sources */ = {
@@ -294,9 +360,11 @@
 		};
 		A9D87BBC299DCE2E00C83793 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 21EAAD1C21F1DF930AFA2273 /* Pods-hanaro.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = hanaro/hanaro.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 9C4VKD5UP6;
@@ -328,9 +396,11 @@
 		};
 		A9D87BBD299DCE2E00C83793 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F3072850FC6D54D1F3F5BC00 /* Pods-hanaro.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = hanaro/hanaro.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 9C4VKD5UP6;

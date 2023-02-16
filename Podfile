@@ -6,5 +6,7 @@ target 'hanaro' do
   use_frameworks!
 
   # Pods for hanaro
+  pod 'FirebaseAnalytics'
+  pod 'FirebaseMessaging'
 
 end
