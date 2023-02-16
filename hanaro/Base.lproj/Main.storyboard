@@ -18,7 +18,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gTj-i8-js7">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -31,8 +31,8 @@
                         <constraints>
                             <constraint firstItem="gTj-i8-js7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="3X2-uH-ZO1"/>
                             <constraint firstItem="gTj-i8-js7" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="OGu-do-5na"/>
-                            <constraint firstItem="gTj-i8-js7" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="mCw-0C-IgP"/>
-                            <constraint firstAttribute="bottom" secondItem="gTj-i8-js7" secondAttribute="bottom" id="xhS-Qe-B1o"/>
+                            <constraint firstItem="gTj-i8-js7" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="mCw-0C-IgP"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="gTj-i8-js7" secondAttribute="bottom" id="xhS-Qe-B1o"/>
                         </constraints>
                     </view>
                     <connections>

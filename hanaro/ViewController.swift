@@ -17,6 +17,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor(red: 243/255, green: 245/255, blue: 248/255, alpha: 1)
         webViewInit()
     }
 
@@ -27,7 +28,7 @@ class ViewController: UIViewController {
         }
         
         // 좌 우 스와이프 동작시 뒤로 가기 앞으로 가기 기능 활성화
-//        webView.allowsBackForwardNavigationGestures = true
+        webView.allowsBackForwardNavigationGestures = true
         
         if let url = URL(string: dev) {
             let request = URLRequest(url: url)
