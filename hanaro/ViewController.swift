@@ -106,13 +106,15 @@ extension ViewController: WKScriptMessageHandler {
                 let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
                 let jsonString = String(data: jsonData, encoding: .utf8)!
                 
-                self.webView.evaluateJavaScript("testCode(\(jsonString))") { result, error in
+                self.webView.evaluateJavaScript("responseToken(\(jsonString))") { result, error in
                     guard error == nil else {
                         print(error as Any)
                         return
                     }
                 }
             }
+            
+            print(message.body)
         }
     }
 }
@@ -120,7 +122,7 @@ extension ViewController: WKScriptMessageHandler {
 // MARK: - 얼럿 extension
 extension ViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-        let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "확인", style: .cancel) { _ in
             completionHandler()
         }
@@ -131,7 +133,7 @@ extension ViewController: WKUIDelegate {
     }
     
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
-        let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel) { _ in
             completionHandler(false)
         }
