@@ -19,7 +19,7 @@ class ViewController: UIViewController {
     let devMain = "http://dev.picaloca.com:3020/main"
     let testLogin = "http://dev.picaloca.com:3020/test_login"
     let prodSurvey = "https://www.cyberbankapi.com/intro"
-    let prodMain = "https://www.cyberbankapi.com/main"
+    let prodMain = "https://www.cyberbankapi.com/"
     
     override func viewDidLoad() {
         super.viewDidLoad()
