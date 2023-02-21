@@ -8,14 +8,18 @@
 import UIKit
 import WebKit
 import FirebaseMessaging
+import SafariServices
 
 class ViewController: UIViewController {
     var webView: WKWebView!
+    var createWebView: WKWebView!
     
     // MARK: - 웹뷰 url
     let devSurvey = "http://dev.picaloca.com:3020/intro"
     let devMain = "http://dev.picaloca.com:3020/main"
     let testLogin = "http://dev.picaloca.com:3020/test_login"
+    let prodSurvey = "https://www.cyberbankapi.com/intro"
+    let prodMain = "https://www.cyberbankapi.com/main"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,6 +49,11 @@ class ViewController: UIViewController {
         
         // delegate
         webView.uiDelegate = self
+        webView.navigationDelegate = self
+        
+        // ui
+        webView.isOpaque = false
+        webView.backgroundColor = UIColor(named: "backgroundColor")
     }
     
     func addSubviews() {
@@ -62,16 +71,28 @@ class ViewController: UIViewController {
     func loadWebPage() {
         // URL 이동
         if UserDefaults.standard.bool(forKey: "isVisited") {
-            if let url = URL(string: devMain) {
+            if let url = URL(string: prodMain) {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         } else {
-            if let url = URL(string: devSurvey) {
+            if let url = URL(string: prodSurvey) {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         }
+        
+//        if UserDefaults.standard.bool(forKey: "isVisited") {
+//            if let url = URL(string: devMain) {
+//                let request = URLRequest(url: url)
+//                webView.load(request)
+//            }
+//        } else {
+//            if let url = URL(string: devSurvey) {
+//                let request = URLRequest(url: url)
+//                webView.load(request)
+//            }
+//        }
         
 //        if let url = URL(string: testLogin) {
 //            let request = URLRequest(url: url)
@@ -100,7 +121,8 @@ extension ViewController: WKScriptMessageHandler {
                 guard let self = self else { return }
                 
                 let dict = [
-                    "token": token
+                    "token": token,
+                    "join_type": message.body
                 ]
                 
                 let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
@@ -113,14 +135,12 @@ extension ViewController: WKScriptMessageHandler {
                     }
                 }
             }
-            
-            print(message.body)
         }
     }
 }
 
-// MARK: - 얼럿 extension
-extension ViewController: WKUIDelegate {
+extension ViewController: WKUIDelegate, WKNavigationDelegate {
+    // MARK: - UIAlert
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "확인", style: .cancel) { _ in
@@ -144,6 +164,23 @@ extension ViewController: WKUIDelegate {
         alertController.addAction(okAction)
         DispatchQueue.main.async {
             self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    // MARK: - 외부 url은 safari로 open
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if let url = navigationAction.request.url, url.host != "dev.picaloca.com" && url.host != "www.cyberbankapi.com" {
+            print(url.scheme as Any)
+            print(url.host as Any)
+            
+            let safariVC = SFSafariViewController(url: url)
+            safariVC.modalPresentationStyle = .pageSheet
+
+            present(safariVC, animated: true, completion: nil)
+            
+            decisionHandler(.cancel)
+        } else {
+            decisionHandler(.allow)
         }
     }
 }
