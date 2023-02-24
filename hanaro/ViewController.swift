@@ -1,10 +1,3 @@
-//
-//  ViewController.swift
-//  hanaro
-//
-//  Created by Financial CB on 2023/02/16.
-//
-
 import UIKit
 import WebKit
 import FirebaseMessaging
@@ -16,7 +9,7 @@ class ViewController: UIViewController {
     
     // MARK: - 웹뷰 url
     let devSurvey = "http://dev.picaloca.com:3020/intro"
-    let devMain = "http://dev.picaloca.com:3020/main"
+    let devMain = "http://dev.picaloca.com:3020/"
     let testLogin = "http://dev.picaloca.com:3020/test_login"
     let prodSurvey = "https://www.cyberbankapi.com/intro"
     let prodMain = "https://www.cyberbankapi.com/"
@@ -45,7 +38,7 @@ class ViewController: UIViewController {
         }
         
         // 좌 우 스와이프 동작시 뒤로 가기 앞으로 가기 기능 활성화
-        webView.allowsBackForwardNavigationGestures = true
+//        webView.allowsBackForwardNavigationGestures = true
         
         // delegate
         webView.uiDelegate = self
@@ -169,7 +162,10 @@ extension ViewController: WKUIDelegate, WKNavigationDelegate {
     
     // MARK: - 외부 url은 safari로 open
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let url = navigationAction.request.url, url.host != "dev.picaloca.com" && url.host != "www.cyberbankapi.com" {
+        if let url = navigationAction.request.url,
+            url.host != "dev.picaloca.com" &&
+            url.host != "www.cyberbankapi.com" &&
+            url.host != "talk-apps.kakao.com" {
             print(url.scheme as Any)
             print(url.host as Any)
             
