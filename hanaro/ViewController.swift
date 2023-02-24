@@ -10,7 +10,7 @@ class ViewController: UIViewController {
     // MARK: - 웹뷰 url
     let devSurvey = "http://dev.picaloca.com:3020/intro"
     let devMain = "http://dev.picaloca.com:3020/"
-    let testLogin = "http://dev.picaloca.com:3020/test_login"
+    let testLogin = "https://api.cyberbankapi.com/"
     let prodSurvey = "https://www.cyberbankapi.com/intro"
     let prodMain = "https://www.cyberbankapi.com/"
     
@@ -114,17 +114,25 @@ extension ViewController: WKScriptMessageHandler {
                 guard let self = self else { return }
                 
                 let dict = [
-                    "token": token,
-                    "join_type": message.body
+                    "token": token
                 ]
                 
                 let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
                 let jsonString = String(data: jsonData, encoding: .utf8)!
                 
-                self.webView.evaluateJavaScript("responseToken(\(jsonString))") { result, error in
-                    guard error == nil else {
-                        print(error as Any)
-                        return
+                if message.body as! String == "EMAIL" {
+                    self.webView.evaluateJavaScript("responseTokenEMAIL(\(jsonString))") { result, error in
+                        guard error == nil else {
+                            print(error as Any)
+                            return
+                        }
+                    }
+                } else if message.body as! String == "SNS" {
+                    self.webView.evaluateJavaScript("responseTokenSNS(\(jsonString))") { result, error in
+                        guard error == nil else {
+                            print(error as Any)
+                            return
+                        }
                     }
                 }
             }
