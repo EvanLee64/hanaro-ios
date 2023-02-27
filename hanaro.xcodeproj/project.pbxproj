@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A957D5AD29AC9B17005E01E3 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A957D5AC29AC9B17005E01E3 /* Utils.swift */; };
 		A9D87BAB299DCE2C00C83793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D87BAA299DCE2C00C83793 /* AppDelegate.swift */; };
 		A9D87BAD299DCE2C00C83793 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D87BAC299DCE2C00C83793 /* SceneDelegate.swift */; };
 		A9D87BAF299DCE2C00C83793 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D87BAE299DCE2C00C83793 /* ViewController.swift */; };
@@ -20,6 +21,7 @@
 
 /* Begin PBXFileReference section */
 		21EAAD1C21F1DF930AFA2273 /* Pods-hanaro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hanaro.debug.xcconfig"; path = "Target Support Files/Pods-hanaro/Pods-hanaro.debug.xcconfig"; sourceTree = "<group>"; };
+		A957D5AC29AC9B17005E01E3 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		A9D87BA7299DCE2C00C83793 /* hanaro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hanaro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9D87BAA299DCE2C00C83793 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A9D87BAC299DCE2C00C83793 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				A9D87BB5299DCE2E00C83793 /* LaunchScreen.storyboard */,
 				A9D87BB8299DCE2E00C83793 /* Info.plist */,
 				A9D87BC1299E004100C83793 /* GoogleService-Info.plist */,
+				A957D5AC29AC9B17005E01E3 /* Utils.swift */,
 			);
 			path = hanaro;
 			sourceTree = "<group>";
@@ -219,6 +222,7 @@
 				A9D87BAF299DCE2C00C83793 /* ViewController.swift in Sources */,
 				A9D87BAB299DCE2C00C83793 /* AppDelegate.swift in Sources */,
 				A9D87BAD299DCE2C00C83793 /* SceneDelegate.swift in Sources */,
+				A957D5AD29AC9B17005E01E3 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

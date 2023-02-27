@@ -8,5 +8,6 @@ target 'hanaro' do
   # Pods for hanaro
   pod 'FirebaseAnalytics'
   pod 'FirebaseMessaging'
+  pod 'Alamofire'
 
 end
