@@ -28,7 +28,7 @@ class ViewController: UIViewController {
     
     // MARK: - 웹뷰 세팅
     func setupWebView() {
-        // Swift가 Javascript에게 setPushToken() 호출 요청
+        // Swift가 Javascript에게 함수 호출 요청
         let contentController = WKUserContentController()
         let configuration = WKWebViewConfiguration()
         
@@ -40,7 +40,8 @@ class ViewController: UIViewController {
         webView = WKWebView(frame: .zero, configuration: configuration)
         
         // 캐시 데이터는 앱 실행 시 제거
-        WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
+        removeCache() {
+            print("캐시 제거")
         }
         
         // 좌 우 스와이프 동작시 뒤로 가기 앞으로 가기 기능 활성화
@@ -120,6 +121,13 @@ class ViewController: UIViewController {
                 print("FCM 토큰: \(token)")
                 completionHandler(token)
             }
+        }
+    }
+    
+    // MARK: - 캐시 제거
+    func removeCache(completionHandler: @escaping () -> Void) {
+        WKWebsiteDataStore.default().removeData(ofTypes: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeOfflineWebApplicationCache], modifiedSince: Date(timeIntervalSince1970: 0)) {
+            completionHandler()
         }
     }
 }
@@ -301,7 +309,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                 print(seed)
                 
                 // MARK: - 가입 여부 체크
-                AF.request("\(devMain)api/member/chk/join?email=\(email ?? "")",
+                AF.request("\(prodMain)api/member/chk/join?email=\(email ?? "")",
                            method: .get,
                            encoding: URLEncoding.default,
                            headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -345,7 +353,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                             }
                             
                             // MARK: - 백엔드에 클라이언트 시크릿 요청
-                            AF.request("\(self.devMain)api/member/auth/apple",
+                            AF.request("\(self.prodMain)api/member/auth/apple",
                                        method: .get,
                                        encoding: URLEncoding.default,
                                        headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -407,7 +415,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                             
                             // MARK: - 백엔드에 sns로그인 요청
                             self.setPushToken() { token in
-                                AF.request("\(self.devMain)api/member/login/sns",
+                                AF.request("\(self.prodMain)api/member/login/sns",
                                            method: .post,
                                            parameters: [
                                             "seed": seed,
@@ -425,13 +433,17 @@ extension ViewController: ASAuthorizationControllerDelegate {
                                         
                                         print("로그인 성공")
                                         
-                                        self.webView.evaluateJavaScript("moveToMain()") { result, error in
-                                            guard error == nil else {
-                                                print(error as Any)
-                                                return
+                                        self.removeCache() {
+                                            print("캐시 제거")
+                                    
+                                            self.webView.evaluateJavaScript("moveToMain()") { result, error in
+                                                guard error == nil else {
+                                                    print(error as Any)
+                                                    return
+                                                }
                                             }
                                         }
-                                        
+                    
                                     case .failure:
                                         print("로그인 실패")
                                     }
