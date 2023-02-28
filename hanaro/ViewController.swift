@@ -179,10 +179,10 @@ extension ViewController: WKScriptMessageHandler {
                             "token": refreshToken
                             ],
                            headers: ["Content-Type": "application/x-www-form-urlencoded"])
-                .validate(statusCode: 200..<300)
-                .responseData { response in
-                    switch response.result {
-                    case .success:
+                .validate(statusCode: 200..<600)
+                .responseData {  response in
+                    guard let statusCode = response.response?.statusCode else { return }
+                    if statusCode == 200 {
                         print("애플 탈퇴 success")
                         
                         UserDefaults.standard.set(nil, forKey: "AppleClientSecret")
@@ -201,8 +201,9 @@ extension ViewController: WKScriptMessageHandler {
                                 return
                             }
                         }
+                    } else {
+                        print("애플 탈퇴 failed")
                         
-                    case .failure:
                         let dict = [
                             "isRevoked": "F"
                         ]
@@ -216,8 +217,6 @@ extension ViewController: WKScriptMessageHandler {
                                 return
                             }
                         }
-                        
-                        break
                     }
                 }
             }
@@ -302,7 +301,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                 print(seed)
                 
                 // MARK: - 가입 여부 체크
-                AF.request("http://dev.picaloca.com:3020/api/member/chk/join?email=\(email ?? "")",
+                AF.request("\(devMain)api/member/chk/join?email=\(email ?? "")",
                            method: .get,
                            encoding: URLEncoding.default,
                            headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -346,7 +345,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                             }
                             
                             // MARK: - 백엔드에 클라이언트 시크릿 요청
-                            AF.request("http://dev.picaloca.com:3020/api/member/auth/apple",
+                            AF.request("\(self.devMain)api/member/auth/apple",
                                        method: .get,
                                        encoding: URLEncoding.default,
                                        headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -372,17 +371,16 @@ extension ViewController: ASAuthorizationControllerDelegate {
                                     UserDefaults.standard.set(clientSecret, forKey: "AppleClientSecret")
                                     
                                     // MARK: - 애플에 리프레시 토큰 요청
-                                    // TODO: - Invalid Client 에러
                                     AF.request("https://appleid.apple.com/auth/token",
                                                method: .post,
                                                parameters: [
-                                                "client_id": "9C4VKD5UP6",
+                                                "client_id": "com.cbfinancial.app",
                                                 "client_secret": clientSecret,
                                                 "code": authCodeString,
                                                 "grant_type": "authorization_code"
                                                ],
                                                headers: ["Content-Type": "application/x-www-form-urlencoded"])
-                                    .validate(statusCode: 200..<500)
+                                    .validate(statusCode: 200..<300)
                                     .responseData { response in
                                         switch response.result {
                                         case .success:
@@ -407,9 +405,37 @@ extension ViewController: ASAuthorizationControllerDelegate {
                         } else if ret == "F" {
                             print("이미 가입")
                             
-                            if let url = URL(string: self.devMain) {
-                                let request = URLRequest(url: url)
-                                self.webView.load(request)
+                            // MARK: - 백엔드에 sns로그인 요청
+                            self.setPushToken() { token in
+                                AF.request("\(self.devMain)api/member/login/sns",
+                                           method: .post,
+                                           parameters: [
+                                            "seed": seed,
+                                            "email": email ?? "",
+                                            "join_type": "A",
+                                            "platform": "i",
+                                            "push_token": token
+                                           ],
+                                           encoding: URLEncoding.default,
+                                           headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                                .validate(statusCode: 200..<300)
+                                .responseData { response in
+                                    switch response.result {
+                                    case .success:
+                                        
+                                        print("로그인 성공")
+                                        
+                                        self.webView.evaluateJavaScript("moveToMain()") { result, error in
+                                            guard error == nil else {
+                                                print(error as Any)
+                                                return
+                                            }
+                                        }
+                                        
+                                    case .failure:
+                                        print("로그인 실패")
+                                    }
+                                }
                             }
                         }
                         
