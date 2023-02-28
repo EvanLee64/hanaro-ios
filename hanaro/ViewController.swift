@@ -34,6 +34,7 @@ class ViewController: UIViewController {
         
         contentController.add(self, name: "setPushToken")
         contentController.add(self, name: "appleLoginBtnClick")
+        contentController.add(self, name: "appleQuitBtnClick")
         
         configuration.userContentController = contentController
         webView = WKWebView(frame: .zero, configuration: configuration)
@@ -43,7 +44,7 @@ class ViewController: UIViewController {
         }
         
         // 좌 우 스와이프 동작시 뒤로 가기 앞으로 가기 기능 활성화
-//        webView.allowsBackForwardNavigationGestures = true
+        //        webView.allowsBackForwardNavigationGestures = true
         
         // delegate
         webView.uiDelegate = self
@@ -71,34 +72,34 @@ class ViewController: UIViewController {
     // MARK: - 웹뷰 로드
     func loadWebPage() {
         // URL 이동
-//        if UserDefaults.standard.bool(forKey: "isVisited") {
-//            if let url = URL(string: prodMain) {
-//                let request = URLRequest(url: url)
-//                webView.load(request)
-//            }
-//        } else {
-//            if let url = URL(string: prodSurvey) {
-//                let request = URLRequest(url: url)
-//                webView.load(request)
-//            }
-//        }
-        
         if UserDefaults.standard.bool(forKey: "isVisited") {
-            if let url = URL(string: devMain) {
+            if let url = URL(string: prodMain) {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         } else {
-            if let url = URL(string: devSurvey) {
+            if let url = URL(string: prodSurvey) {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         }
         
-//        if let url = URL(string: testLogin) {
-//            let request = URLRequest(url: url)
-//            webView.load(request)
+//        if UserDefaults.standard.bool(forKey: "isVisited") {
+//            if let url = URL(string: devMain) {
+//                let request = URLRequest(url: url)
+//                webView.load(request)
+//            }
+//        } else {
+//            if let url = URL(string: devSurvey) {
+//                let request = URLRequest(url: url)
+//                webView.load(request)
+//            }
 //        }
+        
+        //        if let url = URL(string: testLogin) {
+        //            let request = URLRequest(url: url)
+        //            webView.load(request)
+        //        }
     }
     
     // MARK: - 웹뷰와 웹브라우저 구분
@@ -131,20 +132,20 @@ extension ViewController: WKScriptMessageHandler {
                 guard let self = self else { return }
                 
                 let dict = [
-                    "pushToken": token
+                    "push_token": token
                 ]
                 
                 let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
                 let jsonString = String(data: jsonData, encoding: .utf8)!
                 
-                if message.body as! String == "EMAIL" {
+                if message.body as! String == "e" {
                     self.webView.evaluateJavaScript("responseTokenEMAIL(\(jsonString))") { result, error in
                         guard error == nil else {
                             print(error as Any)
                             return
                         }
                     }
-                } else if message.body as! String == "SNS" {
+                } else {
                     self.webView.evaluateJavaScript("responseTokenSNS(\(jsonString))") { result, error in
                         guard error == nil else {
                             print(error as Any)
@@ -154,14 +155,73 @@ extension ViewController: WKScriptMessageHandler {
                 }
             }
         } else if message.name == "appleLoginBtnClick" {
+            
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
-
+            
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
             authorizationController.delegate = self
             authorizationController.presentationContextProvider = self as? ASAuthorizationControllerPresentationContextProviding
             authorizationController.performRequests()
+            
+        } else if message.name == "appleQuitBtnClick" {
+            
+            if let clientSecret = UserDefaults.standard.string(forKey: "AppleClientSecret"),
+               let refreshToken = UserDefaults.standard.string(forKey: "AppleRefreshToken") {
+               
+                // MARK: - 애플에 탈퇴 요청
+                AF.request("https://appleid.apple.com/auth/revoke",
+                           method: .post,
+                           parameters: [
+                            "client_id": "com.cbfinancial.app",
+                            "client_secret": clientSecret,
+                            "token": refreshToken
+                            ],
+                           headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                .validate(statusCode: 200..<300)
+                .responseData { response in
+                    switch response.result {
+                    case .success:
+                        print("애플 탈퇴 success")
+                        
+                        UserDefaults.standard.set(nil, forKey: "AppleClientSecret")
+                        UserDefaults.standard.set(nil, forKey: "AppleRefreshToken")
+                        
+                        let dict = [
+                            "isRevoked": "S"
+                        ]
+                        
+                        let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
+                        let jsonString = String(data: jsonData, encoding: .utf8)!
+                        
+                        self.webView.evaluateJavaScript("appleQuitResponse(\(jsonString))") { result, error in
+                            guard error == nil else {
+                                print(error as Any)
+                                return
+                            }
+                        }
+                        
+                    case .failure:
+                        let dict = [
+                            "isRevoked": "F"
+                        ]
+                        
+                        let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
+                        let jsonString = String(data: jsonData, encoding: .utf8)!
+                        
+                        self.webView.evaluateJavaScript("appleQuitResponse(\(jsonString))") { result, error in
+                            guard error == nil else {
+                                print(error as Any)
+                                return
+                            }
+                        }
+                        
+                        break
+                    }
+                }
+            }
+            
         }
     }
 }
@@ -197,17 +257,17 @@ extension ViewController: WKUIDelegate, WKNavigationDelegate {
     // MARK: - 외부 url은 safari로 open
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if let url = navigationAction.request.url,
-            url.host != "dev.picaloca.com" &&
+           url.host != "dev.picaloca.com" &&
             url.host != "www.cyberbankapi.com" &&
             url.host != "talk-apps.kakao.com" {
             print(url.scheme as Any)
             print(url.host as Any)
-
+            
             let safariVC = SFSafariViewController(url: url)
             safariVC.modalPresentationStyle = .pageSheet
-
+            
             present(safariVC, animated: true, completion: nil)
-
+            
             decisionHandler(.cancel)
         } else {
             decisionHandler(.allow)
@@ -223,91 +283,151 @@ extension ViewController: ASAuthorizationControllerDelegate {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         switch authorization.credential {
-        // Apple ID
+            // Apple ID
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
-           // 계정 정보 가져오기
-           let userIdentifier = appleIDCredential.user
-           var fullName = appleIDCredential.fullName
-           var email = appleIDCredential.email
-
-           if let authorizationCode = appleIDCredential.authorizationCode,
-              let identityToken = appleIDCredential.identityToken,
-              let authCodeString = String(data: authorizationCode, encoding: .utf8),
-              let identityTokenString = String(data: identityToken, encoding: .utf8) {
-               
-               email = Utils.decode(jwtToken: identityTokenString)["email"] as? String ?? ""
-               let seed = Utils.decode(jwtToken: identityTokenString)["sub"] as? String ?? ""
-               
-               print(email ?? "nil")
-               print(seed)
-               
-               AF.request("http://dev.picaloca.com:3020/api/member/chk/join?email=\(email ?? "")",
-                          method: .get,
-                          encoding: URLEncoding.default,
-                          headers: ["Content-Type": "application/x-www-form-urlencoded"])
-               .validate(statusCode: 200..<300)
-               .responseData { [weak self] response in
-                   guard let self = self else { return }
-                   
-                   switch response.result {
-                   case .success:
-                       print("success")
-                       
-                       guard let data = response.value else { return }
-                       let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                       guard let ret = dataDictionary["ret"] as? String else { return }
-                       
-                       print(ret)
+            // 계정 정보 가져오기
+            //            let userIdentifier = appleIDCredential.user
+            let fullName = appleIDCredential.fullName
+            var email = appleIDCredential.email
+            
+            if let authorizationCode = appleIDCredential.authorizationCode,
+               let identityToken = appleIDCredential.identityToken,
+               let authCodeString = String(data: authorizationCode, encoding: .utf8),
+               let identityTokenString = String(data: identityToken, encoding: .utf8) {
+                
+                email = Utils.decode(jwtToken: identityTokenString)["email"] as? String ?? ""
+                let seed = Utils.decode(jwtToken: identityTokenString)["sub"] as? String ?? ""
+                
+                print(email ?? "nil")
+                print(seed)
+                
+                // MARK: - 가입 여부 체크
+                AF.request("http://dev.picaloca.com:3020/api/member/chk/join?email=\(email ?? "")",
+                           method: .get,
+                           encoding: URLEncoding.default,
+                           headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                .validate(statusCode: 200..<300)
+                .responseData { [weak self] response in
+                    guard let self = self else { return }
                     
-                       if ret == "S" {
-                           print("가입 가능")
-                           
-                           self.setPushToken() { token in
-                               let familyName = fullName?.familyName ?? ""
-                               let givenName = fullName?.givenName ?? ""
-                               
-                               let dict = [
-                                   "email": email,
-                                   "fullName": familyName + givenName,
-                                   "seed": seed,
-                                   "pushToken": token
-                               ]
-                               
-                               let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
-                               let jsonString = String(data: jsonData, encoding: .utf8)!
-                               
-                               self.webView.evaluateJavaScript("appleLoginToJoin(\(jsonString))") { result, error in
-                                   guard error == nil else {
-                                       print(error as Any)
-                                       return
-                                   }
-                               }
-                           }
-                           
-                       } else if ret == "F" {
-                           print("이미 가입")
-                           
-                           if let url = URL(string: self.devMain) {
-                               let request = URLRequest(url: url)
-                               self.webView.load(request)
-                           }
-                       }
-                       
-                   case .failure:
-                       break
-                   }
-               }
-           }
-             
+                    switch response.result {
+                    case .success:
+                        print("member/chk/join success")
+                        
+                        guard let data = response.value else { return }
+                        let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                        guard let ret = dataDictionary["ret"] as? String else { return }
+                        
+                        print(ret)
+                        
+                        if ret == "S" {
+                            print("가입 가능")
+                            
+                            self.setPushToken() { token in
+                                let familyName = fullName?.familyName ?? ""
+                                let givenName = fullName?.givenName ?? ""
+                                
+                                let dict = [
+                                    "email": email,
+                                    "fullName": familyName + givenName,
+                                    "seed": seed,
+                                    "pushToken": token
+                                ]
+                                
+                                let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
+                                let jsonString = String(data: jsonData, encoding: .utf8)!
+                                
+                                self.webView.evaluateJavaScript("appleLoginToJoin(\(jsonString))") { result, error in
+                                    guard error == nil else {
+                                        print(error as Any)
+                                        return
+                                    }
+                                }
+                            }
+                            
+                            // MARK: - 백엔드에 클라이언트 시크릿 요청
+                            AF.request("http://dev.picaloca.com:3020/api/member/auth/apple",
+                                       method: .get,
+                                       encoding: URLEncoding.default,
+                                       headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                            .validate(statusCode: 200..<300)
+                            .responseData { [weak self] response in
+                                guard let _ = self else { return }
+                                
+                                switch response.result {
+                                case .success:
+                                    print("member/auth/apple success")
+                                    
+                                    guard let data = response.data else { return }
+                                    
+                                    guard let output = try? JSONDecoder().decode(AppleLoginResponse.self, from: data) else {
+                                        print("Error: JSON Data Parsing failed")
+                                        return
+                                    }
+                                    
+                                    let clientSecret = output.data.clientSecret ?? ""
+                                    
+                                    print("client_secret: \(clientSecret)")
+                                    
+                                    UserDefaults.standard.set(clientSecret, forKey: "AppleClientSecret")
+                                    
+                                    // MARK: - 애플에 리프레시 토큰 요청
+                                    // TODO: - Invalid Client 에러
+                                    AF.request("https://appleid.apple.com/auth/token",
+                                               method: .post,
+                                               parameters: [
+                                                "client_id": "9C4VKD5UP6",
+                                                "client_secret": clientSecret,
+                                                "code": authCodeString,
+                                                "grant_type": "authorization_code"
+                                               ],
+                                               headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                                    .validate(statusCode: 200..<500)
+                                    .responseData { response in
+                                        switch response.result {
+                                        case .success:
+                                            
+                                            guard let data = response.value else { return }
+                                            let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                                            guard let refreshToken = dataDictionary["refresh_token"] as? String else { return }
+                                            
+                                            UserDefaults.standard.set(refreshToken, forKey: "AppleRefreshToken")
+                                            
+                                            print("refresh_token: \(refreshToken)")
+                                            
+                                        case .failure:
+                                            print("애플 토큰 생성 실패 - \(response.error.debugDescription)")
+                                        }
+                                    }
+                                case .failure(let error):
+                                    print(error)
+                                }
+                            }
+                            
+                        } else if ret == "F" {
+                            print("이미 가입")
+                            
+                            if let url = URL(string: self.devMain) {
+                                let request = URLRequest(url: url)
+                                self.webView.load(request)
+                            }
+                        }
+                        
+                    case .failure:
+                        break
+                    }
+                }
+            }
+            
         case let passwordCredential as ASPasswordCredential:
-           // Sign in using an existing iCloud Keychain credential.
-           let username = passwordCredential.user
-           let password = passwordCredential.password
-
-           print("username: \(username)")
-           print("password: \(password)")
+            // Sign in using an existing iCloud Keychain credential.
+            let username = passwordCredential.user
+            let password = passwordCredential.password
+            
+            print("username: \(username)")
+            print("password: \(password)")
         default:
-           break
+            break
         }
     }
     
