@@ -9,12 +9,8 @@ class ViewController: UIViewController {
     var webView: WKWebView!
     var createWebView: WKWebView!
     
-    // MARK: - 웹뷰 url
-    let devSurvey = "http://dev.picaloca.com:3020/intro"
-    let devMain = "http://dev.picaloca.com:3020/"
-    let testLogin = "https://api.cyberbankapi.com/"
-    let prodSurvey = "https://www.cyberbankapi.com/intro"
-    let prodMain = "https://www.cyberbankapi.com/"
+    // MARK: - 서버 url
+    let serverUrl = Server.prod.rawValue
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,33 +70,16 @@ class ViewController: UIViewController {
     func loadWebPage() {
         // URL 이동
         if UserDefaults.standard.bool(forKey: "isVisited") {
-            if let url = URL(string: prodMain) {
+            if let url = URL(string: "\(serverUrl)") {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         } else {
-            if let url = URL(string: prodSurvey) {
+            if let url = URL(string: "\(serverUrl)intro") {
                 let request = URLRequest(url: url)
                 webView.load(request)
             }
         }
-        
-//        if UserDefaults.standard.bool(forKey: "isVisited") {
-//            if let url = URL(string: devMain) {
-//                let request = URLRequest(url: url)
-//                webView.load(request)
-//            }
-//        } else {
-//            if let url = URL(string: devSurvey) {
-//                let request = URLRequest(url: url)
-//                webView.load(request)
-//            }
-//        }
-        
-        //        if let url = URL(string: testLogin) {
-        //            let request = URLRequest(url: url)
-        //            webView.load(request)
-        //        }
     }
     
     // MARK: - 웹뷰와 웹브라우저 구분
@@ -309,7 +288,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                 print(seed)
                 
                 // MARK: - 가입 여부 체크
-                AF.request("\(prodMain)api/member/chk/join?email=\(email ?? "")",
+                AF.request("\(serverUrl)api/member/chk/join?email=\(email ?? "")",
                            method: .get,
                            encoding: URLEncoding.default,
                            headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -353,7 +332,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                             }
                             
                             // MARK: - 백엔드에 클라이언트 시크릿 요청
-                            AF.request("\(self.prodMain)api/member/auth/apple",
+                            AF.request("\(self.serverUrl)api/member/auth/apple",
                                        method: .get,
                                        encoding: URLEncoding.default,
                                        headers: ["Content-Type": "application/x-www-form-urlencoded"])
@@ -415,7 +394,7 @@ extension ViewController: ASAuthorizationControllerDelegate {
                             
                             // MARK: - 백엔드에 sns로그인 요청
                             self.setPushToken() { token in
-                                AF.request("\(self.prodMain)api/member/login/sns",
+                                AF.request("\(self.serverUrl)api/member/login/sns",
                                            method: .post,
                                            parameters: [
                                             "seed": seed,

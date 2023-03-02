@@ -33,7 +33,7 @@
 		A9D87BB6299DCE2E00C83793 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A9D87BB8299DCE2E00C83793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A9D87BBF299DD83200C83793 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		A9D87BC1299E004100C83793 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../저축하나로 문서/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A9D87BC1299E004100C83793 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../저축하나로 문서/push-noti/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A9D87BC3299E04C800C83793 /* hanaro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hanaro.entitlements; sourceTree = "<group>"; };
 		D8F68BC92126D7D94CAD154B /* Pods_hanaro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hanaro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3072850FC6D54D1F3F5BC00 /* Pods-hanaro.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hanaro.release.xcconfig"; path = "Target Support Files/Pods-hanaro/Pods-hanaro.release.xcconfig"; sourceTree = "<group>"; };

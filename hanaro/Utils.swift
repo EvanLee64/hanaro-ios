@@ -1,7 +1,12 @@
 import Foundation
 
-// MARK: - JWT decode
+enum Server : String, Codable {
+    case dev = "http://dev.picaloca.com:3020/"
+    case prod = "https://www.cyberbankapi.com/"
+}
+
 class Utils {
+    // MARK: - JWT decode
     static func decode(jwtToken jwt: String) -> [String: Any] {
         func base64UrlDecode(_ value: String) -> Data? {
             var base64 = value
