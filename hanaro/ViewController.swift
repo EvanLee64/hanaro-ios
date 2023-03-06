@@ -287,153 +287,174 @@ extension ViewController: ASAuthorizationControllerDelegate {
                 print(email ?? "nil")
                 print(seed)
                 
-                // MARK: - 가입 여부 체크
-                AF.request("\(serverUrl)api/member/chk/join?email=\(email ?? "")",
-                           method: .get,
-                           encoding: URLEncoding.default,
-                           headers: ["Content-Type": "application/x-www-form-urlencoded"])
-                .validate(statusCode: 200..<300)
-                .responseData { [weak self] response in
+                // MARK: - 백엔드에 sns로그인 요청
+                self.setPushToken() { [weak self] token in
                     guard let self = self else { return }
                     
-                    switch response.result {
-                    case .success:
-                        print("member/chk/join success")
+                    AF.request("\(self.serverUrl)api/member/login/sns",
+                               method: .post,
+                               parameters: [
+                                "seed": seed,
+                                "email": email ?? "",
+                                "join_type": "A",
+                                "platform": "i",
+                                "push_token": token
+                               ],
+                               encoding: URLEncoding.default,
+                               headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                    .validate(statusCode: 200..<300)
+                    .responseData { [weak self] response in
+                        guard let self = self else { return }
                         
-                        guard let data = response.value else { return }
-                        let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                        guard let ret = dataDictionary["ret"] as? String else { return }
-                        
-                        print(ret)
-                        
-                        if ret == "S" {
-                            print("가입 가능")
+                        switch response.result {
+                        case .success:
                             
-                            self.setPushToken() { token in
-                                let familyName = fullName?.familyName ?? ""
-                                let givenName = fullName?.givenName ?? ""
-                                
-                                let dict = [
-                                    "email": email,
-                                    "fullName": familyName + givenName,
-                                    "seed": seed,
-                                    "pushToken": token
-                                ]
-                                
-                                let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
-                                let jsonString = String(data: jsonData, encoding: .utf8)!
-                                
-                                self.webView.evaluateJavaScript("appleLoginToJoin(\(jsonString))") { result, error in
-                                    guard error == nil else {
-                                        print(error as Any)
-                                        return
-                                    }
-                                }
-                            }
+                            guard let data = response.value else { return }
+                            let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                            guard let ret = dataDictionary["ret"] as? String else { return }
                             
-                            // MARK: - 백엔드에 클라이언트 시크릿 요청
-                            AF.request("\(self.serverUrl)api/member/auth/apple",
-                                       method: .get,
-                                       encoding: URLEncoding.default,
-                                       headers: ["Content-Type": "application/x-www-form-urlencoded"])
-                            .validate(statusCode: 200..<300)
-                            .responseData { [weak self] response in
-                                guard let _ = self else { return }
+                            if ret == "S" {
                                 
-                                switch response.result {
-                                case .success:
-                                    print("member/auth/apple success")
+                                print("로그인 성공")
+                                
+                                self.removeCache() {
+                                    print("캐시 제거")
                                     
-                                    guard let data = response.data else { return }
-                                    
-                                    guard let output = try? JSONDecoder().decode(AppleLoginResponse.self, from: data) else {
-                                        print("Error: JSON Data Parsing failed")
-                                        return
-                                    }
-                                    
-                                    let clientSecret = output.data.clientSecret ?? ""
-                                    
-                                    print("client_secret: \(clientSecret)")
-                                    
-                                    UserDefaults.standard.set(clientSecret, forKey: "AppleClientSecret")
-                                    
-                                    // MARK: - 애플에 리프레시 토큰 요청
-                                    AF.request("https://appleid.apple.com/auth/token",
-                                               method: .post,
-                                               parameters: [
-                                                "client_id": "com.cbfinancial.app",
-                                                "client_secret": clientSecret,
-                                                "code": authCodeString,
-                                                "grant_type": "authorization_code"
-                                               ],
-                                               headers: ["Content-Type": "application/x-www-form-urlencoded"])
-                                    .validate(statusCode: 200..<300)
-                                    .responseData { response in
-                                        switch response.result {
-                                        case .success:
-                                            
-                                            guard let data = response.value else { return }
-                                            let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                                            guard let refreshToken = dataDictionary["refresh_token"] as? String else { return }
-                                            
-                                            UserDefaults.standard.set(refreshToken, forKey: "AppleRefreshToken")
-                                            
-                                            print("refresh_token: \(refreshToken)")
-                                            
-                                        case .failure:
-                                            print("애플 토큰 생성 실패 - \(response.error.debugDescription)")
+                                    self.webView.evaluateJavaScript("moveToMain()") { result, error in
+                                        guard error == nil else {
+                                            print(error as Any)
+                                            return
                                         }
                                     }
-                                case .failure(let error):
-                                    print(error)
                                 }
-                            }
-                            
-                        } else if ret == "F" {
-                            print("이미 가입")
-                            
-                            // MARK: - 백엔드에 sns로그인 요청
-                            self.setPushToken() { token in
-                                AF.request("\(self.serverUrl)api/member/login/sns",
-                                           method: .post,
-                                           parameters: [
-                                            "seed": seed,
-                                            "email": email ?? "",
-                                            "join_type": "A",
-                                            "platform": "i",
-                                            "push_token": token
-                                           ],
+                            } else {
+                                
+                                print("로그인 실패")
+                                
+                                // MARK: - 가입 여부 체크
+                                AF.request("\(self.serverUrl)api/member/chk/join?email=\(email ?? "")",
+                                           method: .get,
                                            encoding: URLEncoding.default,
                                            headers: ["Content-Type": "application/x-www-form-urlencoded"])
                                 .validate(statusCode: 200..<300)
-                                .responseData { response in
+                                .responseData { [weak self] response in
+                                    guard let self = self else { return }
+                                    
                                     switch response.result {
                                     case .success:
+                                        print("member/chk/join success")
                                         
-                                        print("로그인 성공")
+                                        guard let data = response.value else { return }
+                                        let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                                        guard let ret = dataDictionary["ret"] as? String else { return }
                                         
-                                        self.removeCache() {
-                                            print("캐시 제거")
-                                    
-                                            self.webView.evaluateJavaScript("moveToMain()") { result, error in
+                                        print(ret)
+                                        
+                                        if ret == "S" {
+                                            print("가입 가능")
+                                            
+                                            let familyName = fullName?.familyName ?? ""
+                                            let givenName = fullName?.givenName ?? ""
+                                            
+                                            let dict = [
+                                                "email": email,
+                                                "fullName": familyName + givenName,
+                                                "seed": seed,
+                                                "pushToken": token
+                                            ]
+                                            
+                                            let jsonData = try! JSONSerialization.data(withJSONObject: dict, options: [])
+                                            let jsonString = String(data: jsonData, encoding: .utf8)!
+                                            
+                                            self.webView.evaluateJavaScript("appleLoginToJoin(\(jsonString))") { result, error in
+                                                guard error == nil else {
+                                                    print(error as Any)
+                                                    return
+                                                }
+                                            }
+                                            
+                                            // MARK: - 백엔드에 클라이언트 시크릿 요청
+                                            AF.request("\(self.serverUrl)api/member/auth/apple",
+                                                       method: .get,
+                                                       encoding: URLEncoding.default,
+                                                       headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                                            .validate(statusCode: 200..<300)
+                                            .responseData { [weak self] response in
+                                                guard let _ = self else { return }
+                                                
+                                                switch response.result {
+                                                case .success:
+                                                    print("member/auth/apple success")
+                                                    
+                                                    guard let data = response.data else { return }
+                                                    
+                                                    guard let output = try? JSONDecoder().decode(AppleLoginResponse.self, from: data) else {
+                                                        print("Error: JSON Data Parsing failed")
+                                                        return
+                                                    }
+                                                    
+                                                    let clientSecret = output.data.clientSecret ?? ""
+                                                    
+                                                    print("client_secret: \(clientSecret)")
+                                                    
+                                                    UserDefaults.standard.set(clientSecret, forKey: "AppleClientSecret")
+                                                    
+                                                    // MARK: - 애플에 리프레시 토큰 요청
+                                                    AF.request("https://appleid.apple.com/auth/token",
+                                                               method: .post,
+                                                               parameters: [
+                                                                "client_id": "com.cbfinancial.app",
+                                                                "client_secret": clientSecret,
+                                                                "code": authCodeString,
+                                                                "grant_type": "authorization_code"
+                                                               ],
+                                                               headers: ["Content-Type": "application/x-www-form-urlencoded"])
+                                                    .validate(statusCode: 200..<300)
+                                                    .responseData { response in
+                                                        switch response.result {
+                                                        case .success:
+                                                            
+                                                            guard let data = response.value else { return }
+                                                            let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                                                            guard let refreshToken = dataDictionary["refresh_token"] as? String else { return }
+                                                            
+                                                            UserDefaults.standard.set(refreshToken, forKey: "AppleRefreshToken")
+                                                            
+                                                            print("refresh_token: \(refreshToken)")
+                                                            
+                                                        case .failure:
+                                                            print("애플 토큰 생성 실패 - \(response.error.debugDescription)")
+                                                        }
+                                                    }
+                                                case .failure(let error):
+                                                    print(error)
+                                                }
+                                            }
+                                            
+                                        } else if ret == "F" {
+                                            print("이미 가입")
+                                            
+                                            self.webView.evaluateJavaScript("appleLoginIsQuit()") { result, error in
                                                 guard error == nil else {
                                                     print(error as Any)
                                                     return
                                                 }
                                             }
                                         }
-                    
+                                        
                                     case .failure:
-                                        print("로그인 실패")
+                                        break
                                     }
                                 }
+                                
                             }
+                            
+                        case .failure:
+                            print("로그인 실패")
                         }
-                        
-                    case .failure:
-                        break
                     }
                 }
+                
             }
             
         case let passwordCredential as ASPasswordCredential:
